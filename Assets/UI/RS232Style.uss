@@ -1,0 +1,377 @@
+
+/* RS232 — NyaEnergy */
+
+.rs232-main-panel {
+    background-color: rgb(24, 29, 40);
+    border-radius: 0;
+}
+
+.rs232-settings-panel {
+    background-color: rgb(32, 40, 54);
+    border-radius: 0;
+}
+
+/* Текст */
+
+.rs232-title {
+    color: white;
+    font-size: 20px;
+    -unity-font-style: bold;
+}
+
+.rs232-status {
+    color: rgb(175, 185, 200);
+    font-size: 13px;
+}
+
+.rs232-history-title {
+    color: white;
+    font-size: 16px;
+    -unity-font-style: bold;
+}
+
+.rs232-reading {
+    color: rgb(220, 230, 245);
+    font-size: 18px;
+}
+
+.rs232-field-label {
+    color: rgb(220, 230, 245);
+    font-size: 13px;
+}
+
+.rs232-field-label-small {
+    color: rgb(220, 230, 245);
+    font-size: 12px;
+}
+
+/* Кнопка: фон как у левой панели,
+   неоновая рамка 3 px */
+
+.rs232-connect-button,
+.rs232-connect-button:hover,
+.rs232-connect-button:focus,
+.rs232-connect-button:active {
+    background-color: rgb(24, 29, 40);
+    color: white;
+
+    border-top-width: 3px;
+    border-bottom-width: 3px;
+    border-left-width: 3px;
+    border-right-width: 3px;
+
+    border-top-color: rgb(57, 255, 143);
+    border-bottom-color: rgb(57, 255, 143);
+    border-left-color: rgb(57, 255, 143);
+    border-right-color: rgb(57, 255, 143);
+
+    border-radius: 8px;
+    -unity-text-align: middle-center;
+}
+
+/* DropdownField */
+
+.dark-dropdown {
+    margin: 0;
+    padding: 0;
+    min-height: 36px;
+}
+
+DropdownField.dark-dropdown
+.unity-base-field__input.unity-base-popup-field__input.unity-popup-field__input,
+
+DropdownField.dark-dropdown:hover
+.unity-base-field__input.unity-base-popup-field__input.unity-popup-field__input,
+
+DropdownField.dark-dropdown:focus
+.unity-base-field__input.unity-base-popup-field__input.unity-popup-field__input,
+
+DropdownField.dark-dropdown:active
+.unity-base-field__input.unity-base-popup-field__input.unity-popup-field__input {
+    height: 36px;
+    min-height: 36px;
+
+    margin: 0;
+    padding-left: 12px;
+    padding-right: 12px;
+
+    background-color: rgb(65, 73, 87);
+    border-width: 0;
+    border-radius: 8px;
+
+    align-items: center;
+}
+
+/* Наведение не меняет цвет */
+
+.dark-dropdown .unity-base-popup-field__input,
+.dark-dropdown:hover .unity-base-popup-field__input,
+.dark-dropdown:focus .unity-base-popup-field__input,
+.dark-dropdown:active .unity-base-popup-field__input {
+    background-color: rgb(65, 73, 87);
+    border-color: transparent;
+}
+
+/* Белый текст */
+
+.dark-dropdown .unity-base-popup-field__text,
+.dark-dropdown:hover .unity-base-popup-field__text,
+.dark-dropdown:focus .unity-base-popup-field__text,
+.dark-dropdown:active .unity-base-popup-field__text {
+    color: white;
+    font-size: 14px;
+    -unity-text-align: middle-left;
+    flex-grow: 1;
+}
+
+/* Стрелка */
+
+.dark-dropdown .unity-base-popup-field__arrow {
+    background-image: none;
+
+    width: 9px;
+    height: 9px;
+    min-width: 9px;
+    min-height: 9px;
+
+    border-top-width: 0;
+    border-left-width: 0;
+    border-right-width: 2px;
+    border-bottom-width: 2px;
+
+    border-right-color: white;
+    border-bottom-color: white;
+
+    rotate: 45deg;
+    margin-right: 6px;
+    margin-top: -4px;
+}
+
+.dark-dropdown:hover .unity-base-popup-field__arrow,
+.dark-dropdown:focus .unity-base-popup-field__arrow,
+.dark-dropdown:active .unity-base-popup-field__arrow {
+    border-right-color: white;
+    border-bottom-color: white;
+}
+
+/* Раскрытый DropdownField */
+
+.unity-base-dropdown__container-outer {
+    background-color: rgb(48, 55, 68);
+    border-width: 1px;
+    border-color: rgb(75, 87, 103);
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.unity-base-dropdown__container-inner {
+    background-color: rgb(48, 55, 68);
+    padding-top: 3px;
+    padding-bottom: 3px;
+}
+
+.unity-base-dropdown__item {
+    background-color: rgb(48, 55, 68);
+    min-height: 32px;
+    color: white;
+}
+
+.unity-base-dropdown__item
+.unity-base-dropdown__label {
+    color: white;
+    font-size: 14px;
+}
+
+.unity-base-dropdown__item:checked,
+.unity-base-dropdown__item:checked:enabled {
+    background-color: rgb(57, 68, 81);
+    color: white;
+}
+
+.unity-base-dropdown__item:checked
+.unity-base-dropdown__label {
+    color: white;
+}
+
+/* Наведение: немного светлее */
+
+.unity-base-dropdown__item:hover,
+.unity-base-dropdown__item:hover:enabled {
+    background-color: rgb(65, 74, 88);
+    color: white;
+}
+
+.unity-base-dropdown__item:hover
+.unity-base-dropdown__label {
+    color: white;
+}
+
+.unity-base-dropdown__item:checked:hover,
+.unity-base-dropdown__item:checked:hover:enabled {
+    background-color: rgb(71, 81, 95);
+    color: white;
+}
+
+.unity-base-dropdown__item:checked:hover
+.unity-base-dropdown__label {
+    color: white;
+}
+
+.unity-base-dropdown__checkmark {
+    -unity-background-image-tint-color:
+        rgb(57, 255, 143);
+}
+
+/* TextField */
+
+.dark-input {
+    min-height: 36px;
+    margin: 0;
+    padding: 0;
+
+    --unity-cursor-color: rgb(57, 255, 143);
+    --unity-selection-color: rgba(150, 180, 210, 0.45);
+}
+
+.dark-input .unity-base-text-field__input,
+.dark-input .unity-text-field__input {
+    height: 36px;
+    min-height: 36px;
+
+    margin: 0;
+    padding-left: 12px;
+    padding-right: 12px;
+
+    background-color: rgb(65, 73, 87);
+
+    border-top-width: 0;
+    border-left-width: 0;
+    border-right-width: 0;
+    border-bottom-width: 2px;
+
+    border-bottom-color: transparent;
+    border-radius: 8px;
+
+    color: white;
+    font-size: 14px;
+
+    --unity-cursor-color: rgb(57, 255, 143);
+    --unity-selection-color: rgba(150, 180, 210, 0.45);
+}
+
+/* Наведение */
+
+TextField.dark-input:hover:enabled
+> .unity-base-text-field__input,
+
+.dark-input .unity-base-text-field__input:hover:enabled {
+    background-color: rgb(65, 73, 87);
+
+    border-top-width: 0;
+    border-left-width: 0;
+    border-right-width: 0;
+    border-bottom-width: 2px;
+
+    border-bottom-color: transparent;
+    color: white;
+}
+
+/* Фокус: неоновое подчёркивание */
+
+TextField.dark-input:focus:enabled
+> .unity-base-text-field__input,
+
+TextField.dark-input:focus:enabled
+> .unity-text-field__input,
+
+TextField.dark-input
+.unity-base-text-field__input:focus:enabled,
+
+TextField.dark-input
+.unity-text-field__input:focus:enabled {
+    background-color: rgb(65, 73, 87);
+
+    border-top-width: 0;
+    border-left-width: 0;
+    border-right-width: 0;
+
+    border-bottom-width: 2px;
+    border-bottom-color: rgb(57, 255, 143);
+
+    color: white;
+
+    --unity-cursor-color: rgb(57, 255, 143);
+    --unity-selection-color: rgba(150, 180, 210, 0.45);
+}
+
+/* DTR / RTS */
+
+.signal-button {
+    height: 30px;
+    min-height: 30px;
+
+    margin: 0;
+    padding: 0;
+
+    background-color: rgb(65, 73, 87);
+
+    border-width: 0;
+    border-radius: 6px;
+    color: white;
+
+    justify-content: center;
+    align-items: center;
+}
+
+.signal-button .unity-toggle__input {
+    width: 100%;
+    height: 100%;
+    flex-grow: 1;
+
+    margin: 0;
+    padding: 0;
+
+    background-color: transparent;
+    border-width: 0;
+
+    justify-content: center;
+    align-items: center;
+}
+
+.signal-button .unity-toggle__checkmark {
+    visibility: hidden;
+
+    width: 0;
+    min-width: 0;
+    height: 0;
+    min-height: 0;
+
+    margin: 0;
+    padding: 0;
+    background-image: none;
+}
+
+.signal-button .unity-toggle__text {
+    flex-grow: 1;
+    min-width: 0;
+
+    margin: 0;
+    padding: 0;
+
+    color: white;
+    font-size: 13px;
+    -unity-text-align: middle-center;
+}
+
+.signal-button:checked {
+    background-color: rgb(21, 115, 84);
+}
+
+.signal-button:checked:hover {
+    background-color: rgb(26, 136, 100);
+}
+
+.signal-button:hover:enabled {
+    border-bottom-width: 2px;
+    border-bottom-color: rgb(57, 255, 143);
+}
