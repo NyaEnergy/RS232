@@ -1,6 +1,3 @@
-
-/* RS232 — NyaEnergy */
-
 .rs232-main-panel {
     background-color: rgb(24, 29, 40);
     border-radius: 0;
@@ -45,14 +42,15 @@
     font-size: 12px;
 }
 
-/* Кнопка: фон как у левой панели,
-   неоновая рамка 3 px */
+/*
+ * Кнопка подключения.
+ * Фон всегда одинаковый.
+ * Стандартная фоновая картинка Unity отключена.
+ */
 
-.rs232-connect-button,
-.rs232-connect-button:hover,
-.rs232-connect-button:focus,
-.rs232-connect-button:active {
+#connection-button {
     background-color: rgb(24, 29, 40);
+    background-image: none;
     color: white;
 
     border-top-width: 3px;
@@ -60,13 +58,127 @@
     border-left-width: 3px;
     border-right-width: 3px;
 
+    border-top-color: rgb(65, 73, 87);
+    border-bottom-color: rgb(65, 73, 87);
+    border-left-color: rgb(65, 73, 87);
+    border-right-color: rgb(65, 73, 87);
+
+    border-radius: 8px;
+    -unity-text-align: middle-center;
+}
+
+/*
+ * Зелёное состояние.
+ * Обычное и с фокусом выглядят одинаково.
+ */
+
+#connection-button.rs232-connect-button--ready,
+#connection-button.rs232-connect-button--ready:focus {
+    background-color: rgb(24, 29, 40);
+    background-image: none;
+    color: white;
+
     border-top-color: rgb(57, 255, 143);
     border-bottom-color: rgb(57, 255, 143);
     border-left-color: rgb(57, 255, 143);
     border-right-color: rgb(57, 255, 143);
+}
 
-    border-radius: 8px;
-    -unity-text-align: middle-center;
+/* Зелёная: заметное осветление при наведении */
+
+#connection-button.rs232-connect-button--ready:hover,
+#connection-button.rs232-connect-button--ready:focus:hover {
+    background-color: rgb(24, 29, 40);
+    background-image: none;
+
+    border-top-color: rgb(180, 255, 219);
+    border-bottom-color: rgb(180, 255, 219);
+    border-left-color: rgb(180, 255, 219);
+    border-right-color: rgb(180, 255, 219);
+}
+
+/* Зелёная: затемнение при удержании */
+
+#connection-button.rs232-connect-button--ready:active,
+#connection-button.rs232-connect-button--ready:focus:active,
+#connection-button.rs232-connect-button--ready:hover:active,
+#connection-button.rs232-connect-button--ready:focus:hover:active {
+    background-color: rgb(24, 29, 40);
+    background-image: none;
+
+    border-top-color: rgb(27, 153, 91);
+    border-bottom-color: rgb(27, 153, 91);
+    border-left-color: rgb(27, 153, 91);
+    border-right-color: rgb(27, 153, 91);
+}
+
+/*
+ * Красное состояние.
+ * Обычное и с фокусом выглядят одинаково.
+ */
+
+#connection-button.rs232-connect-button--connected,
+#connection-button.rs232-connect-button--connected:focus {
+    background-color: rgb(24, 29, 40);
+    background-image: none;
+    color: white;
+
+    border-top-color: rgb(228, 92, 108);
+    border-bottom-color: rgb(228, 92, 108);
+    border-left-color: rgb(228, 92, 108);
+    border-right-color: rgb(228, 92, 108);
+}
+
+/* Красная: заметное осветление при наведении */
+
+#connection-button.rs232-connect-button--connected:hover,
+#connection-button.rs232-connect-button--connected:focus:hover {
+    background-color: rgb(24, 29, 40);
+    background-image: none;
+
+    border-top-color: rgb(255, 166, 179);
+    border-bottom-color: rgb(255, 166, 179);
+    border-left-color: rgb(255, 166, 179);
+    border-right-color: rgb(255, 166, 179);
+}
+
+/* Красная: затемнение при удержании */
+
+#connection-button.rs232-connect-button--connected:active,
+#connection-button.rs232-connect-button--connected:focus:active,
+#connection-button.rs232-connect-button--connected:hover:active,
+#connection-button.rs232-connect-button--connected:focus:hover:active {
+    background-color: rgb(24, 29, 40);
+    background-image: none;
+
+    border-top-color: rgb(164, 54, 77);
+    border-bottom-color: rgb(164, 54, 77);
+    border-left-color: rgb(164, 54, 77);
+    border-right-color: rgb(164, 54, 77);
+}
+
+/*
+ * Серое состояние.
+ * Только обводка серая.
+ * Наведение и нажатие ничего не изменяют.
+ */
+
+#connection-button.rs232-connect-button--unavailable,
+#connection-button.rs232-connect-button--unavailable:disabled,
+#connection-button.rs232-connect-button--unavailable:hover,
+#connection-button.rs232-connect-button--unavailable:focus,
+#connection-button.rs232-connect-button--unavailable:active,
+#connection-button.rs232-connect-button--unavailable:focus:hover,
+#connection-button.rs232-connect-button--unavailable:focus:active {
+    background-color: rgb(24, 29, 40);
+    background-image: none;
+    color: white;
+    opacity: 1;
+
+    border-top-color: rgb(65, 73, 87);
+    border-bottom-color: rgb(65, 73, 87);
+    border-left-color: rgb(65, 73, 87);
+    border-right-color: rgb(65, 73, 87);
 }
 
 /* DropdownField */
@@ -102,8 +214,6 @@ DropdownField.dark-dropdown:active
     align-items: center;
 }
 
-/* Наведение не меняет цвет */
-
 .dark-dropdown .unity-base-popup-field__input,
 .dark-dropdown:hover .unity-base-popup-field__input,
 .dark-dropdown:focus .unity-base-popup-field__input,
@@ -112,8 +222,6 @@ DropdownField.dark-dropdown:active
     border-color: transparent;
 }
 
-/* Белый текст */
-
 .dark-dropdown .unity-base-popup-field__text,
 .dark-dropdown:hover .unity-base-popup-field__text,
 .dark-dropdown:focus .unity-base-popup-field__text,
@@ -121,10 +229,17 @@ DropdownField.dark-dropdown:active
     color: white;
     font-size: 14px;
     -unity-text-align: middle-left;
+
     flex-grow: 1;
+    flex-shrink: 1;
+    min-width: 0px;
+    margin-right: 0px;
+
+    overflow: hidden;
+    white-space: nowrap;
 }
 
-/* Стрелка */
+/* Стрелка DropdownField */
 
 .dark-dropdown .unity-base-popup-field__arrow {
     background-image: none;
@@ -133,6 +248,8 @@ DropdownField.dark-dropdown:active
     height: 9px;
     min-width: 9px;
     min-height: 9px;
+
+    flex-shrink: 0;
 
     border-top-width: 0;
     border-left-width: 0;
@@ -154,7 +271,23 @@ DropdownField.dark-dropdown:active
     border-bottom-color: white;
 }
 
-/* Раскрытый DropdownField */
+/* Компактные поля Parity и Flow Control */
+
+DropdownField#parity-input.dark-dropdown
+.unity-base-field__input.unity-base-popup-field__input.unity-popup-field__input,
+
+DropdownField#flowcontrol-input.dark-dropdown
+.unity-base-field__input.unity-base-popup-field__input.unity-popup-field__input {
+    padding-left: 6px;
+    padding-right: 4px;
+}
+
+#parity-input .unity-base-popup-field__arrow,
+#flowcontrol-input .unity-base-popup-field__arrow {
+    margin-right: 2px;
+}
+
+/* Раскрытое меню DropdownField */
 
 .unity-base-dropdown__container-outer {
     background-color: rgb(48, 55, 68);
@@ -162,24 +295,46 @@ DropdownField.dark-dropdown:active
     border-color: rgb(75, 87, 103);
     border-radius: 8px;
     overflow: hidden;
+    min-width: 146px;
 }
 
 .unity-base-dropdown__container-inner {
     background-color: rgb(48, 55, 68);
     padding-top: 3px;
     padding-bottom: 3px;
+    min-width: 0px;
 }
 
 .unity-base-dropdown__item {
     background-color: rgb(48, 55, 68);
     min-height: 32px;
+    min-width: 0px;
     color: white;
+
+    padding-left: 4px;
+    padding-right: 4px;
 }
 
 .unity-base-dropdown__item
 .unity-base-dropdown__label {
     color: white;
-    font-size: 14px;
+    font-size: 13px;
+
+    min-width: 0px;
+    margin-left: 0px;
+    margin-right: 0px;
+    flex-shrink: 1;
+    white-space: nowrap;
+}
+
+.unity-base-dropdown__checkmark {
+    min-width: 12px;
+    width: 12px;
+    margin-left: 0px;
+    margin-right: 4px;
+
+    -unity-background-image-tint-color:
+        rgb(57, 255, 143);
 }
 
 .unity-base-dropdown__item:checked,
@@ -192,8 +347,6 @@ DropdownField.dark-dropdown:active
 .unity-base-dropdown__label {
     color: white;
 }
-
-/* Наведение: немного светлее */
 
 .unity-base-dropdown__item:hover,
 .unity-base-dropdown__item:hover:enabled {
@@ -215,11 +368,6 @@ DropdownField.dark-dropdown:active
 .unity-base-dropdown__item:checked:hover
 .unity-base-dropdown__label {
     color: white;
-}
-
-.unity-base-dropdown__checkmark {
-    -unity-background-image-tint-color:
-        rgb(57, 255, 143);
 }
 
 /* TextField */
@@ -259,8 +407,6 @@ DropdownField.dark-dropdown:active
     --unity-selection-color: rgba(150, 180, 210, 0.45);
 }
 
-/* Наведение */
-
 TextField.dark-input:hover:enabled
 > .unity-base-text-field__input,
 
@@ -275,8 +421,6 @@ TextField.dark-input:hover:enabled
     border-bottom-color: transparent;
     color: white;
 }
-
-/* Фокус: неоновое подчёркивание */
 
 TextField.dark-input:focus:enabled
 > .unity-base-text-field__input,
@@ -304,7 +448,7 @@ TextField.dark-input
     --unity-selection-color: rgba(150, 180, 210, 0.45);
 }
 
-/* DTR / RTS */
+/* DTR / RTS: стили сохранены для совместимости */
 
 .signal-button {
     height: 30px;

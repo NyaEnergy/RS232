@@ -376,7 +376,6 @@ GameObject:
   - component: {fileID: 811340743}
   - component: {fileID: 811340745}
   - component: {fileID: 811340746}
-  - component: {fileID: 811340747}
   m_Layer: 5
   m_Name: AppUI
   m_TagString: Untagged
@@ -483,18 +482,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SerialConnectionControls
   receiver: {fileID: 1010693497}
---- !u!114 &811340747
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 811340742}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e0125f0cece006b428edbe189c3e00a0, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::RS232FileLogger
 --- !u!1 &1010693492
 GameObject:
   m_ObjectHideFlags: 0
@@ -505,7 +492,6 @@ GameObject:
   m_Component:
   - component: {fileID: 1010693494}
   - component: {fileID: 1010693495}
-  - component: {fileID: 1010693498}
   - component: {fileID: 1010693497}
   m_Layer: 0
   m_Name: COMManager
@@ -554,18 +540,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ComPortReceiverProbe
   enableKeyboardOutput: 1
---- !u!114 &1010693498
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1010693492}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f668ab70acffb19469c00a561cc0de65, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::SbiSimulator
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0

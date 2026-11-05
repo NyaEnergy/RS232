@@ -1,4 +1,4 @@
-using System;
+using System.Collections.Generic;
 using System.IO.Ports;
 using UnityEngine;
 using UnityEngine.UIElements;
@@ -13,14 +13,13 @@ public class SerialConnectionControls : MonoBehaviour {
     private Button connectionButton;
     private DropdownField portField;
 
-    private TextField baudRateField;
-    private TextField dataBitsField;
-    private TextField parityField;
-    private TextField stopBitsField;
-    private TextField flowControlField;
+    private DropdownField baudRateField;
+    private DropdownField dataBitsField;
+    private DropdownField parityField;
+    private DropdownField flowControlField;
 
-    private Toggle dtrToggle;
-    private Toggle rtsToggle;
+    private bool dtrEnabled;
+    private bool rtsEnabled;
 
     private VisualElement autosaveRoot;
 
@@ -54,40 +53,52 @@ public class SerialConnectionControls : MonoBehaviour {
             root.Q<DropdownField>("port-dropdown");
 
         baudRateField =
-            root.Q<TextField>("baudrate-input");
+            root.Q<DropdownField>("baudrate-input");
 
         dataBitsField =
-            root.Q<TextField>("databits-input");
+            root.Q<DropdownField>("databits-input");
 
         parityField =
-            root.Q<TextField>("parity-input");
-
-        stopBitsField =
-            root.Q<TextField>("stopbits-input");
+            root.Q<DropdownField>("parity-input");
 
         flowControlField =
-            root.Q<TextField>("flowcontrol-input");
-
-        dtrToggle =
-            root.Q<Toggle>("dtr-toggle");
-
-        rtsToggle =
-            root.Q<Toggle>("rts-toggle");
+            root.Q<DropdownField>("flowcontrol-input");
 
         if (connectionButton == null ||
             portField == null ||
             baudRateField == null ||
             dataBitsField == null ||
             parityField == null ||
-            stopBitsField == null ||
-            flowControlField == null ||
-            dtrToggle == null ||
-            rtsToggle == null) {
+            flowControlField == null) {
             Debug.LogError(
                 "[Connection] Не найдены элементы интерфейса."
             );
             return;
         }
+
+        baudRateField.choices = new List<string> {
+            "1200", "2400", "4800", "9600", "19200"
+        };
+        baudRateField.SetValueWithoutNotify("9600");
+
+        dataBitsField.choices = new List<string> {
+            "7", "8"
+        };
+        dataBitsField.SetValueWithoutNotify("8");
+
+        parityField.choices = new List<string> {
+            "None", "Odd", "Even"
+        };
+        parityField.SetValueWithoutNotify("Odd");
+
+        flowControlField.choices = new List<string> {
+            "None", "XON/XOFF"
+        };
+        flowControlField.SetValueWithoutNotify("None");
+
+        // Значения сигналов по умолчанию.
+        dtrEnabled = false;
+        rtsEnabled = false;
 
         connectionButton.clicked += OnConnectionClicked;
 
@@ -133,27 +144,9 @@ public class SerialConnectionControls : MonoBehaviour {
             return;
         }
 
-        StopBits stopBits;
-
-        switch (stopBitsField.value?.Trim()) {
-            case "1":
-                stopBits = StopBits.One;
-                break;
-
-            case "2":
-                stopBits = StopBits.Two;
-                break;
-
-            default:
-                Debug.LogWarning(
-                    "[Connection] Stop Bits: допустимы 1 или 2."
-                );
-                return;
-        }
-
         if (!TryParseParity(parityField.value, out Parity parity)) {
             Debug.LogWarning(
-                "[Connection] Parity: пусто, Odd или Even."
+                "[Connection] Parity: None, Odd или Even."
             );
             return;
         }
@@ -162,8 +155,8 @@ public class SerialConnectionControls : MonoBehaviour {
             flowControlField.value,
             out Handshake handshake)) {
             Debug.LogWarning(
-                "[Connection] Flow Control: пусто, " +
-                "XON/XOFF, RTS/CTS или RTS/CTS + XON/XOFF."
+                "[Connection] Flow Control: допустимы " +
+                "None или XON/XOFF."
             );
             return;
         }
@@ -173,23 +166,53 @@ public class SerialConnectionControls : MonoBehaviour {
             baud,
             parity,
             dataBits,
-            stopBits,
+            StopBits.One,
             handshake,
-            dtrToggle.value,
-            rtsToggle.value
+            dtrEnabled,
+            rtsEnabled
         );
 
         if (connected) {
-            SerialSettingsStore.Save(new SerialSettingsData {
-                portName = portField.value,
-                baudRate = baudRateField.value,
-                dataBits = dataBitsField.value,
-                parity = parityField.value,
-                stopBits = stopBitsField.value,
-                flowControl = flowControlField.value,
-                dtr = dtrToggle.value,
-                rts = rtsToggle.value
-            });
+            SaveCurrentSettings();
+        }
+    }
+
+    private static string NormalizeSavedParity(string value) {
+        string text = (value ?? "")
+            .Trim()
+            .ToUpperInvariant();
+
+        switch (text) {
+            case "":
+            case "NONE":
+                return "None";
+
+            case "ODD":
+                return "Odd";
+
+            case "EVEN":
+                return "Even";
+
+            default:
+                return "Odd";
+        }
+    }
+
+    private static string NormalizeSavedFlowControl(
+        string value) {
+        string text = (value ?? "")
+            .Trim()
+            .ToUpperInvariant()
+            .Replace(" ", "");
+
+        switch (text) {
+            case "XON/XOFF":
+                return "XON/XOFF";
+
+            case "":
+            case "NONE":
+            default:
+                return "None";
         }
     }
 
@@ -238,14 +261,6 @@ public class SerialConnectionControls : MonoBehaviour {
                 handshake = Handshake.XOnXOff;
                 return true;
 
-            case "RTS/CTS":
-                handshake = Handshake.RequestToSend;
-                return true;
-
-            case "RTS/CTS+XON/XOFF":
-                handshake = Handshake.RequestToSendXOnXOff;
-                return true;
-
             default:
                 handshake = Handshake.None;
                 return false;
@@ -258,21 +273,36 @@ public class SerialConnectionControls : MonoBehaviour {
 
         SerialSettingsData saved = SerialSettingsStore.Load();
 
-        baudRateField.SetValueWithoutNotify(saved.baudRate ?? "9600");
-        dataBitsField.SetValueWithoutNotify(saved.dataBits ?? "8");
-        parityField.SetValueWithoutNotify(saved.parity ?? "");
-        stopBitsField.SetValueWithoutNotify(saved.stopBits ?? "1");
-        flowControlField.SetValueWithoutNotify(saved.flowControl ?? "");
+        string savedBaudRate = saved.baudRate?.Trim();
+        baudRateField.SetValueWithoutNotify(
+            baudRateField.choices.Contains(savedBaudRate)
+                ? savedBaudRate
+                : "9600"
+        );
 
-        dtrToggle.SetValueWithoutNotify(saved.dtr);
-        rtsToggle.SetValueWithoutNotify(saved.rts);
+        string savedDataBits = saved.dataBits?.Trim();
+        dataBitsField.SetValueWithoutNotify(
+            dataBitsField.choices.Contains(savedDataBits)
+                ? savedDataBits
+                : "8"
+        );
 
-        // Выбор порта выполняем после обновления
-        // списка доступных COM-портов.
+        parityField.SetValueWithoutNotify(
+            NormalizeSavedParity(saved.parity)
+        );
+
+        flowControlField.SetValueWithoutNotify(
+            NormalizeSavedFlowControl(saved.flowControl)
+        );
+
+        // Сохраняем значения сигналов из старого JSON.
+        dtrEnabled = saved.dtr;
+        rtsEnabled = saved.rts;
+
+        // Выбор порта после обновления списка COM-портов.
         DropdownField dropdown = portField;
 
-        dropdown.schedule.Execute(() =>
-        {
+        dropdown.schedule.Execute(() => {
             if (dropdown.panel == null)
                 return;
 
@@ -294,10 +324,6 @@ public class SerialConnectionControls : MonoBehaviour {
         autosaveRoot.RegisterCallback<ChangeEvent<string>>(
             OnTextSettingChanged
         );
-
-        autosaveRoot.RegisterCallback<ChangeEvent<bool>>(
-            OnToggleSettingChanged
-        );
     }
 
     private void DetachAutoSave() {
@@ -308,10 +334,6 @@ public class SerialConnectionControls : MonoBehaviour {
             OnTextSettingChanged
         );
 
-        autosaveRoot.UnregisterCallback<ChangeEvent<bool>>(
-            OnToggleSettingChanged
-        );
-
         autosaveRoot = null;
     }
 
@@ -320,17 +342,7 @@ public class SerialConnectionControls : MonoBehaviour {
             !ReferenceEquals(evt.target, baudRateField) &&
             !ReferenceEquals(evt.target, dataBitsField) &&
             !ReferenceEquals(evt.target, parityField) &&
-            !ReferenceEquals(evt.target, stopBitsField) &&
             !ReferenceEquals(evt.target, flowControlField)) {
-            return;
-        }
-
-        SaveCurrentSettings();
-    }
-
-    private void OnToggleSettingChanged(ChangeEvent<bool> evt) {
-        if (!ReferenceEquals(evt.target, dtrToggle) &&
-            !ReferenceEquals(evt.target, rtsToggle)) {
             return;
         }
 
@@ -342,10 +354,7 @@ public class SerialConnectionControls : MonoBehaviour {
             baudRateField == null ||
             dataBitsField == null ||
             parityField == null ||
-            stopBitsField == null ||
-            flowControlField == null ||
-            dtrToggle == null ||
-            rtsToggle == null) {
+            flowControlField == null) {
             return;
         }
 
@@ -354,11 +363,10 @@ public class SerialConnectionControls : MonoBehaviour {
             baudRate = baudRateField.value,
             dataBits = dataBitsField.value,
             parity = parityField.value,
-            stopBits = stopBitsField.value,
+            stopBits = "1",
             flowControl = flowControlField.value,
-            dtr = dtrToggle.value,
-            rts = rtsToggle.value
+            dtr = dtrEnabled,
+            rts = rtsEnabled
         });
     }
 }
-

@@ -1,4 +1,3 @@
-
 using System;
 using System.Collections.Generic;
 using System.IO.Ports;
@@ -14,6 +13,10 @@ public class ConnectionStatusUI : MonoBehaviour {
     private PanelRenderer panelRenderer;
 
     private DropdownField portDropdown;
+    private DropdownField baudRateDropdown;
+    private DropdownField dataBitsDropdown;
+    private DropdownField parityDropdown;
+    private DropdownField flowControlDropdown;
     private Button connectionButton;
 
     private Label statusLabel;
@@ -30,12 +33,36 @@ public class ConnectionStatusUI : MonoBehaviour {
     private static readonly Color32 AccentGreen =
         new Color32(57, 255, 143, 255);
 
-    // Фон кнопки всегда как у левой панели.
-    private static readonly Color32 ButtonBackground =
-        new Color32(24, 29, 40, 255);
-
     private static readonly Color32 DisconnectedOrange =
         new Color32(250, 145, 77, 255);
+
+    private const float PortRefreshInterval = 1f;
+    private const string NoPortsText = "Нет доступных портов";
+
+    private const string ButtonUnavailableClass =
+        "rs232-connect-button--unavailable";
+
+    private const string ButtonReadyClass =
+        "rs232-connect-button--ready";
+
+    private const string ButtonConnectedClass =
+        "rs232-connect-button--connected";
+
+    private enum ConnectionButtonState {
+        Unknown,
+        Unavailable,
+        Ready,
+        Connected
+    }
+
+    private readonly List<string> availablePorts =
+        new List<string>();
+
+    private ConnectionButtonState buttonState =
+        ConnectionButtonState.Unknown;
+
+    private float nextPortRefreshTime;
+    private bool? portSettingsAvailable;
 
     private void OnEnable() {
         panelRenderer = GetComponent<PanelRenderer>();
@@ -78,6 +105,18 @@ public class ConnectionStatusUI : MonoBehaviour {
         portDropdown =
             root.Q<DropdownField>("port-dropdown");
 
+        baudRateDropdown =
+            root.Q<DropdownField>("baudrate-input");
+
+        dataBitsDropdown =
+            root.Q<DropdownField>("databits-input");
+
+        parityDropdown =
+            root.Q<DropdownField>("parity-input");
+
+        flowControlDropdown =
+            root.Q<DropdownField>("flowcontrol-input");
+
         connectionButton =
             root.Q<Button>("connection-button");
 
@@ -106,13 +145,30 @@ public class ConnectionStatusUI : MonoBehaviour {
         RegisterCaretField(stopBitsInput);
         RegisterCaretField(flowControlInput);
 
+        availablePorts.Clear();
+        buttonState = ConnectionButtonState.Unknown;
+        portSettingsAvailable = null;
+
         RefreshPortList();
+
+        nextPortRefreshTime =
+            Time.unscaledTime + PortRefreshInterval;
+
         RefreshStatus();
         RefreshReadings();
         RefreshConnectionButton();
     }
 
     private void Update() {
+        if (portDropdown != null &&
+            Time.unscaledTime >= nextPortRefreshTime) {
+
+            nextPortRefreshTime =
+                Time.unscaledTime + PortRefreshInterval;
+
+            RefreshPortList();
+        }
+
         RefreshStatus();
         RefreshReadings();
         RefreshConnectionButton();
@@ -146,6 +202,17 @@ public class ConnectionStatusUI : MonoBehaviour {
         bool connected =
             receiver != null && receiver.IsConnected;
 
+        bool canConnect =
+            !connected &&
+            receiver != null &&
+            HasSelectedPort();
+
+        ConnectionButtonState state = connected
+            ? ConnectionButtonState.Connected
+            : canConnect
+                ? ConnectionButtonState.Ready
+                : ConnectionButtonState.Unavailable;
+
         string caption = connected
             ? "Отключить"
             : "Подключить";
@@ -153,13 +220,54 @@ public class ConnectionStatusUI : MonoBehaviour {
         if (connectionButton.text != caption)
             connectionButton.text = caption;
 
-        // Заливка совпадает с фоном левой панели.
-        // Неоновую рамку задаёт RS232Style.uss.
-        connectionButton.style.backgroundColor =
-            new StyleColor((Color) ButtonBackground);
+        if (buttonState != state) {
+            connectionButton.EnableInClassList(
+                ButtonUnavailableClass,
+                state == ConnectionButtonState.Unavailable
+            );
 
-        connectionButton.style.color =
-            new StyleColor(Color.white);
+            connectionButton.EnableInClassList(
+                ButtonReadyClass,
+                state == ConnectionButtonState.Ready
+            );
+
+            connectionButton.EnableInClassList(
+                ButtonConnectedClass,
+                state == ConnectionButtonState.Connected
+            );
+
+            buttonState = state;
+        }
+
+        bool shouldEnable =
+            state != ConnectionButtonState.Unavailable;
+
+        if (connectionButton.enabledSelf != shouldEnable) {
+            connectionButton.SetEnabled(shouldEnable);
+        }
+    }
+
+    private bool HasSelectedPort() {
+        if (portDropdown == null ||
+            !portDropdown.enabledInHierarchy) {
+            return false;
+        }
+
+        string selectedPort = portDropdown.value;
+
+        if (string.IsNullOrWhiteSpace(selectedPort))
+            return false;
+
+        foreach (string port in availablePorts) {
+            if (string.Equals(
+                port,
+                selectedPort,
+                StringComparison.OrdinalIgnoreCase)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     private void RefreshReadings() {
@@ -181,51 +289,166 @@ public class ConnectionStatusUI : MonoBehaviour {
     }
 
     private void RefreshPortList() {
-        if (portDropdown == null) {
-            Debug.LogError(
-                "[UI] port-dropdown не найден."
-            );
+        if (portDropdown == null)
             return;
-        }
 
-        string[] ports = SerialPort.GetPortNames();
+        string[] ports;
+
+        try {
+            ports = SerialPort.GetPortNames();
+        } catch (Exception exception) {
+            Debug.LogWarning(
+                "[UI] Не удалось получить список COM-портов: " +
+                exception.Message
+            );
+
+            ports = Array.Empty<string>();
+        }
 
         Array.Sort(
             ports,
             StringComparer.OrdinalIgnoreCase
         );
 
+        // Блокируем настройки, если COM-портов нет.
+        // Сами выбранные значения и JSON не изменяем.
+        RefreshPortSettingsAvailability(
+            ports.Length > 0
+        );
+
         if (ports.Length == 0) {
-            portDropdown.choices = new List<string>
-            {
-                "Нет доступных портов"
-            };
+            availablePorts.Clear();
 
-            portDropdown.SetValueWithoutNotify(
-                "Нет доступных портов"
-            );
+            bool placeholderMissing =
+                portDropdown.choices == null ||
+                portDropdown.choices.Count != 1 ||
+                portDropdown.choices[0] != NoPortsText;
 
-            portDropdown.SetEnabled(false);
+            if (placeholderMissing) {
+                portDropdown.choices =
+                    new List<string> { NoPortsText };
+            }
+
+            if (portDropdown.value != NoPortsText) {
+                portDropdown.SetValueWithoutNotify(
+                    NoPortsText
+                );
+            }
+
+            if (portDropdown.enabledSelf) {
+                portDropdown.SetEnabled(false);
+            }
+
             return;
         }
 
-        string selected = receiver != null
-            ? receiver.ConnectedPortName
-            : string.Empty;
+        bool changed =
+            ports.Length != availablePorts.Count ||
+            !portDropdown.enabledSelf;
 
-        if (string.IsNullOrEmpty(selected))
-            selected = portDropdown.value;
+        if (!changed) {
+            for (int i = 0; i < ports.Length; i++) {
+                if (!string.Equals(
+                    ports[i],
+                    availablePorts[i],
+                    StringComparison.OrdinalIgnoreCase)) {
 
-        if (Array.IndexOf(ports, selected) < 0)
+                    changed = true;
+                    break;
+                }
+            }
+        }
+
+        if (!changed)
+            return;
+
+        availablePorts.Clear();
+        availablePorts.AddRange(ports);
+
+        string selected =
+            receiver != null && receiver.IsConnected
+                ? receiver.ConnectedPortName
+                : portDropdown.value;
+
+        if (Array.FindIndex(
+            ports,
+            port => string.Equals(
+                port,
+                selected,
+                StringComparison.OrdinalIgnoreCase
+            )
+        ) < 0) {
             selected = ports[0];
+        }
 
-        portDropdown.choices = new List<string>(ports);
+        portDropdown.choices =
+            new List<string>(ports);
 
         portDropdown.SetEnabled(true);
         portDropdown.SetValueWithoutNotify(selected);
     }
 
-    // Числовые поля: только цифры.
+    private void RefreshPortSettingsAvailability(
+        bool hasPorts) {
+
+        // Если портов нет, поддерживаем блокировку.
+        // Если они доступны, обновляем состояние
+        // только при переходе из недоступного режима.
+        if (hasPorts && portSettingsAvailable == true)
+            return;
+
+        SetSettingDropdownAvailability(
+            baudRateDropdown,
+            hasPorts
+        );
+
+        SetSettingDropdownAvailability(
+            dataBitsDropdown,
+            hasPorts
+        );
+
+        SetSettingDropdownAvailability(
+            parityDropdown,
+            hasPorts
+        );
+
+        SetSettingDropdownAvailability(
+            flowControlDropdown,
+            hasPorts
+        );
+
+        portSettingsAvailable = hasPorts;
+    }
+
+    private static void SetSettingDropdownAvailability(
+        DropdownField field,
+        bool hasPorts) {
+
+        if (field == null)
+            return;
+
+        // Полностью запрещаем раскрытие списка.
+        if (field.enabledSelf != hasPorts) {
+            field.SetEnabled(hasPorts);
+        }
+
+        // Скрываем только отображение выбранного значения.
+        // Значения DropdownField и Choices сохраняются.
+        VisualElement valueText =
+            field.Q<VisualElement>(
+                className: "unity-base-popup-field__text"
+            );
+
+        if (valueText != null) {
+            if (hasPorts) {
+                valueText.style.visibility =
+                    StyleKeyword.Null;
+            } else {
+                valueText.style.visibility =
+                    Visibility.Hidden;
+            }
+        }
+    }
 
     private void RegisterNumberField(TextField field) {
         if (field == null)
@@ -258,27 +481,30 @@ public class ConnectionStatusUI : MonoBehaviour {
 
     private void OnNumericValueChanged(
         ChangeEvent<string> evt) {
+
         TextField field = evt.target as TextField;
 
         if (field == null)
             return;
 
-        string value = evt.newValue ?? string.Empty;
+        string value =
+            evt.newValue ?? string.Empty;
 
-        var clean = new StringBuilder(value.Length);
+        var clean =
+            new StringBuilder(value.Length);
 
         foreach (char c in value) {
-            if (c >= '0' && c <= '9')
+            if (c >= '0' && c <= '9') {
                 clean.Append(c);
+            }
         }
 
         string filtered = clean.ToString();
 
-        if (value != filtered)
+        if (value != filtered) {
             field.SetValueWithoutNotify(filtered);
+        }
     }
-
-    // Курсор в конце текста при получении фокуса.
 
     private void RegisterCaretField(TextField field) {
         if (field == null)
@@ -309,8 +535,11 @@ public class ConnectionStatusUI : MonoBehaviour {
         );
     }
 
-    private void OnTextFieldFocusIn(FocusInEvent evt) {
-        TextField field = evt.currentTarget as TextField;
+    private void OnTextFieldFocusIn(
+        FocusInEvent evt) {
+
+        TextField field =
+            evt.currentTarget as TextField;
 
         if (field == null)
             return;

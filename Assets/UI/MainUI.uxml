@@ -1,110 +1,90 @@
-
 <ui:UXML xmlns:ui="UnityEngine.UIElements">
 
-    <!-- Основная панель -->
+    <!-- Две панели: гибкая левая и фиксированная правая -->
 
     <ui:VisualElement
         name="main-panel"
         class="rs232-main-panel"
         style="
             flex-grow: 1;
+            flex-direction: row;
             margin: 0px;
-            padding: 12px;">
+            padding: 0px;">
 
-        <!-- Заголовок и статус -->
-
-        <ui:VisualElement
-            name="header-block"
-            style="
-                width: 260px;
-                margin-bottom: 18px;">
-
-            <ui:Label
-                text="RS232"
-                class="rs232-title"
-                style="margin-bottom: 8px;" />
-
-            <ui:Label
-                name="connection-status"
-                text="Ожидание подключения"
-                class="rs232-status" />
-
-        </ui:VisualElement>
-
-        <!-- История последних показаний -->
+        <!-- Левая панель: заголовок и три последних показания -->
 
         <ui:VisualElement
-            name="history-panel"
+            name="left-panel"
             style="
-                width: 260px;
-                flex-grow: 1;">
+                flex-grow: 1;
+                flex-shrink: 1;
+                flex-basis: 0px;
+                min-width: 230px;
+                padding: 12px;
+                flex-direction: column;">
 
-            <ui:Label
-                text="Последние показания"
-                class="rs232-history-title"
-                style="margin-bottom: 10px;" />
-
-            <ui:Label
-                name="reading-1"
-                text="—"
-                class="rs232-reading"
-                style="margin-bottom: 8px;" />
-
-            <ui:Label
-                name="reading-2"
-                text="—"
-                class="rs232-reading"
-                style="margin-bottom: 8px;" />
-
-            <ui:Label
-                name="reading-3"
-                text="—"
-                class="rs232-reading" />
-
-        </ui:VisualElement>
-
-        <!-- Управление подключением -->
-
-        <ui:VisualElement
-            name="connection-controls"
-            style="
-                width: 254px;
-                margin-top: 16px;">
-
-            <ui:Label
-                text="Управление подключением"
-                class="rs232-field-label"
-                style="margin-bottom: 10px;" />
-
-            <ui:Button
-                name="connection-button"
-                text="Подключить"
-                class="rs232-connect-button"
+            <ui:VisualElement
+                name="header-block"
                 style="
-                    width: 254px;
-                    height: 40px;
-                    margin: 0px;" />
+                    width: 100%;
+                    margin-bottom: 12px;">
+
+                <ui:Label
+                    text="RS232"
+                    class="rs232-title" />
+
+            </ui:VisualElement>
+
+            <ui:VisualElement
+                name="history-panel"
+                style="width: 100%;">
+
+                <ui:Label
+                    text="Последние показания"
+                    class="rs232-history-title"
+                    style="margin-bottom: 12px;" />
+
+                <ui:Label
+                    name="reading-1"
+                    text="—"
+                    class="rs232-reading"
+                    style="margin-bottom: 8px;" />
+
+                <ui:Label
+                    name="reading-2"
+                    text="—"
+                    class="rs232-reading"
+                    style="margin-bottom: 8px;" />
+
+                <ui:Label
+                    name="reading-3"
+                    text="—"
+                    class="rs232-reading" />
+
+            </ui:VisualElement>
 
         </ui:VisualElement>
 
-        <!-- Правая панель настроек -->
+        <!-- Правая панель: три ряда настроек и кнопка -->
 
         <ui:VisualElement
             name="port-settings"
             class="rs232-settings-panel"
             style="
-                position: absolute;
-                top: 0px;
-                bottom: 0px;
-                right: 0px;
-                width: 244px;
+                width: 252px;
+                min-width: 252px;
+                flex-shrink: 0;
                 padding: 12px;
                 flex-direction: column;
-                justify-content: space-between;">
+                justify-content: flex-start;">
 
             <!-- COM-порт -->
 
-            <ui:VisualElement name="port-picker">
+            <ui:VisualElement
+                name="port-picker"
+                style="
+                    width: 100%;
+                    margin-bottom: 12px;">
 
                 <ui:Label
                     text="COM-порт"
@@ -115,20 +95,25 @@
                     name="port-dropdown"
                     class="dark-dropdown"
                     style="
+                        width: 100%;
                         height: 36px;
                         margin: 0px;" />
 
             </ui:VisualElement>
 
-            <!-- Baud Rate и Data Bits -->
+            <!-- Baud Rate + Data Bits -->
 
             <ui:VisualElement
                 name="data-settings"
-                style="flex-direction: row;">
+                style="
+                    width: 100%;
+                    flex-direction: row;
+                    margin-bottom: 12px;">
 
                 <ui:VisualElement
                     style="
-                        width: 106px;
+                        flex-grow: 3;
+                        flex-basis: 0px;
                         min-width: 0px;
                         margin-right: 8px;">
 
@@ -137,13 +122,11 @@
                         class="rs232-field-label-small"
                         style="margin-bottom: 6px;" />
 
-                    <ui:TextField
+                    <ui:DropdownField
                         name="baudrate-input"
-                        class="dark-input"
-                        value="9600"
-                        select-all-on-focus="false"
-                        select-all-on-mouse-up="false"
+                        class="dark-dropdown"
                         style="
+                            width: 100%;
                             height: 36px;
                             margin: 0px;" />
 
@@ -151,7 +134,8 @@
 
                 <ui:VisualElement
                     style="
-                        width: 106px;
+                        flex-grow: 2;
+                        flex-basis: 0px;
                         min-width: 0px;">
 
                     <ui:Label
@@ -159,13 +143,11 @@
                         class="rs232-field-label-small"
                         style="margin-bottom: 6px;" />
 
-                    <ui:TextField
+                    <ui:DropdownField
                         name="databits-input"
-                        class="dark-input"
-                        value="8"
-                        select-all-on-focus="false"
-                        select-all-on-mouse-up="false"
+                        class="dark-dropdown"
                         style="
+                            width: 100%;
                             height: 36px;
                             margin: 0px;" />
 
@@ -173,15 +155,18 @@
 
             </ui:VisualElement>
 
-            <!-- Parity и Stop Bits -->
+            <!-- Parity + Flow Control -->
 
             <ui:VisualElement
                 name="format-settings"
-                style="flex-direction: row;">
+                style="
+                    width: 100%;
+                    flex-direction: row;">
 
                 <ui:VisualElement
                     style="
-                        width: 106px;
+                        flex-grow: 2;
+                        flex-basis: 0px;
                         min-width: 0px;
                         margin-right: 8px;">
 
@@ -190,13 +175,11 @@
                         class="rs232-field-label-small"
                         style="margin-bottom: 6px;" />
 
-                    <ui:TextField
+                    <ui:DropdownField
                         name="parity-input"
-                        class="dark-input"
-                        value=""
-                        select-all-on-focus="false"
-                        select-all-on-mouse-up="false"
+                        class="dark-dropdown"
                         style="
+                            width: 100%;
                             height: 36px;
                             margin: 0px;" />
 
@@ -204,21 +187,20 @@
 
                 <ui:VisualElement
                     style="
-                        width: 106px;
+                        flex-grow: 3;
+                        flex-basis: 0px;
                         min-width: 0px;">
 
                     <ui:Label
-                        text="Stop Bits"
+                        text="Flow Control"
                         class="rs232-field-label-small"
                         style="margin-bottom: 6px;" />
 
-                    <ui:TextField
-                        name="stopbits-input"
-                        class="dark-input"
-                        value="1"
-                        select-all-on-focus="false"
-                        select-all-on-mouse-up="false"
+                    <ui:DropdownField
+                        name="flowcontrol-input"
+                        class="dark-dropdown"
                         style="
+                            width: 100%;
                             height: 36px;
                             margin: 0px;" />
 
@@ -226,57 +208,17 @@
 
             </ui:VisualElement>
 
-            <!-- Flow Control -->
+            <!-- Кнопка подключения -->
 
-            <ui:VisualElement name="flow-settings">
-
-                <ui:Label
-                    text="Flow Control"
-                    class="rs232-field-label-small"
-                    style="margin-bottom: 6px;" />
-
-                <ui:TextField
-                    name="flowcontrol-input"
-                    class="dark-input"
-                    value=""
-                    select-all-on-focus="false"
-                    select-all-on-mouse-up="false"
-                    style="
-                        height: 36px;
-                        margin: 0px;" />
-
-            </ui:VisualElement>
-
-            <!-- Переключатели DTR и RTS -->
-
-            <ui:VisualElement
-                name="signal-controls"
+            <ui:Button
+                name="connection-button"
+                text="Подключить"
+                class="rs232-connect-button"
                 style="
-                    flex-direction: row;
-                    height: 30px;">
-
-                <ui:Toggle
-                    name="dtr-toggle"
-                    class="signal-button"
-                    text="DTR"
-                    value="false"
-                    style="
-                        width: 106px;
-                        height: 30px;
-                        margin: 0px;
-                        margin-right: 8px;" />
-
-                <ui:Toggle
-                    name="rts-toggle"
-                    class="signal-button"
-                    text="RTS"
-                    value="false"
-                    style="
-                        width: 106px;
-                        height: 30px;
-                        margin: 0px;" />
-
-            </ui:VisualElement>
+                    width: 100%;
+                    height: 40px;
+                    margin: 0px;
+                    margin-top: 18px;" />
 
         </ui:VisualElement>
 
